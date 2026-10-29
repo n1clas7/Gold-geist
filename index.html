@@ -1,0 +1,552 @@
+
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Golden Heist</title>
+<style>
+:root {
+  --bg:#08100d;
+  --panel:#122019;
+  --panel2:#1b2d22;
+  --gold:#e7c36b;
+  --gold2:#a77b2b;
+  --text:#f8f1df;
+  --muted:#a9b8ab;
+  --green:#3c9a68;
+  --red:#d5685e;
+}
+* {box-sizing:border-box}
+body {
+  margin:0;
+  min-height:100vh;
+  color:var(--text);
+  background:radial-gradient(ellipse at top,#1d3928 0,#08100d 65%);
+  font-family:system-ui,-apple-system,Arial,sans-serif;
+}
+button {font:inherit;cursor:pointer;touch-action:manipulation}
+button:disabled {opacity:.4;cursor:not-allowed}
+header {
+  display:flex;justify-content:space-between;align-items:center;
+  gap:10px;padding:15px;border-bottom:1px solid #d5b75a35;
+  background:#08100df2;position:sticky;top:0;z-index:5;
+}
+.logo {font-weight:950;letter-spacing:1px;color:var(--gold);font-size:19px}
+.logo span {color:white}
+.header-chip {
+  border:1px solid #c6a34a65;border-radius:25px;
+  padding:8px 11px;color:var(--gold);font-size:13px;white-space:nowrap;
+}
+main {width:min(760px,100%);margin:auto;padding:20px 14px 40px}
+.hero {text-align:center;padding:30px 8px}
+.eyebrow {font-size:11px;letter-spacing:3px;color:var(--gold);text-transform:uppercase}
+h1 {
+  font-size:clamp(38px,10vw,66px);line-height:1.05;margin:14px 0;
+  color:var(--gold);text-shadow:0 4px 30px #e7c36b20;
+}
+h2 {margin:0 0 12px;font-size:23px}
+p {color:var(--muted);line-height:1.6}
+.gold-btn {
+  background:linear-gradient(135deg,#ffe9a5,#c08d2f);
+  color:#211909;border:0;border-radius:12px;padding:14px 18px;font-weight:850;
+}
+.dark-btn {
+  background:#243b2b;color:white;border:1px solid #48644c;
+  border-radius:12px;padding:12px 15px;font-weight:700;
+}
+.danger-btn {
+  background:#5b2a25;color:white;border:1px solid #8b4940;
+  border-radius:12px;padding:12px 15px;
+}
+.menu-buttons {display:grid;gap:12px;margin:24px auto;max-width:410px}
+.menu-buttons button {width:100%}
+.info-grid {display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-top:24px}
+.info-box {background:#122019;border:1px solid #ffffff12;border-radius:14px;padding:13px 6px;text-align:center}
+.info-box b {display:block;color:var(--gold);font-size:19px}
+.info-box small {color:var(--muted)}
+.panel {background:linear-gradient(145deg,#172a1e,#0d1812);border:1px solid #d5b75a35;border-radius:18px;padding:15px;margin:14px 0}
+.hidden {display:none!important}
+.top-actions {display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.top-actions button {flex:1}
+.stats {display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin:10px 0 14px}
+.stat {background:#13231a;border:1px solid #ffffff10;border-radius:12px;padding:10px 5px;text-align:center}
+.stat small {display:block;color:var(--muted);font-size:11px}
+.stat strong {color:var(--gold);font-size:19px}
+.board-wrap {background:#09140d;padding:8px;border:2px solid #8e6a2d;border-radius:15px;max-width:490px;margin:auto}
+.board {
+  display:grid;grid-template-columns:repeat(8,minmax(0,1fr));
+  gap:3px;width:100%;aspect-ratio:1;
+}
+.tile {
+  min-width:0;min-height:0;display:flex;align-items:center;justify-content:center;
+  border-radius:5px;background:#1b3928;border:1px solid #31533a;
+  font-size:clamp(15px,4.7vw,28px);position:relative;
+}
+.tile:nth-child(odd) {background:#163122}
+.tile.wall {background:#202922;border-color:#303b32}
+.tile.exit {background:#665020;border-color:#e7c36b}
+.tile.player {background:#276e4a;border-color:#7bd69a}
+.tile.bot {background:#5a3027;border-color:#df8271}
+.tile.treasure {background:#57451d;border-color:#e7c36b}
+.tile.trap {background:#4d2526;border-color:#aa5252}
+.tile span {line-height:1}
+.legend {display:flex;gap:10px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin-top:12px}
+.legend span {display:flex;align-items:center;gap:4px}
+.status {min-height:45px;line-height:1.5}
+.controls {
+  display:grid;grid-template-columns:repeat(3,1fr);gap:8px;
+  max-width:260px;margin:15px auto 0;
+}
+.controls button {min-height:53px;font-size:22px;background:#203b29;color:var(--gold);border:1px solid #56704c;border-radius:12px}
+.controls .empty {visibility:hidden}
+.bot-row {display:flex;justify-content:space-between;gap:8px;align-items:center;padding:10px 0;border-bottom:1px solid #ffffff10}
+.bot-row:last-child {border-bottom:0}
+.bot-row small {color:var(--muted)}
+.result {text-align:center;padding:20px 8px}
+.result .big {font-size:52px}
+.result h2 {color:var(--gold)}
+footer {text-align:center;color:#718476;font-size:12px;padding:20px}
+@media(min-width:600px) {
+  main {padding-top:28px}
+  .tile {border-radius:7px}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">♛ GOLDEN <span>HEIST</span></div>
+  <div class="header-chip">🏆 Bestwert: <span id="best">0</span></div>
+</header>
+
+<main>
+  <section id="menu">
+    <div class="hero">
+      <div class="eyebrow">The ultimate treasure challenge</div>
+      <h1>GOLDEN<br>HEIST</h1>
+      <p>Der Tresor ist voller Schätze. Sammle die goldenen Relikte, weiche den Hindernissen aus und erreiche den Ausgang, bevor deine Rivalen es schaffen.</p>
+      <div class="menu-buttons">
+        <button class="gold-btn" data-action="start" data-mode="solo">⚔️ Solo-Abenteuer</button>
+        <button class="dark-btn" data-action="start" data-mode="bots">🤖 Gegen drei Bots</button>
+      </div>
+      <div class="info-grid">
+        <div class="info-box"><b>🗝️</b><small>Schätze sammeln</small></div>
+        <div class="info-box"><b>🤖</b><small>Clevere Gegner</small></div>
+        <div class="info-box"><b>👑</b><small>Schatzmeister werden</small></div>
+      </div>
+    </div>
+    <div class="panel">
+      <h2>📜 So funktioniert's</h2>
+      <p>1. Bewege dich mit den Pfeilen über das Spielfeld.</p>
+      <p>2. Sammle mindestens <strong>5 Relikte im Solo-Modus</strong> oder <strong>3 im Bot-Modus</strong>.</p>
+      <p>3. Erreiche den goldenen Ausgang. Im Bot-Modus versuchen die Computergegner ebenfalls, Schätze zu sammeln und den Ausgang zu erreichen.</p>
+      <p>4. Mauern blockieren deinen Weg. Jeder Zug lässt die Bots ebenfalls handeln.</p>
+    </div>
+  </section>
+
+  <section id="game" class="hidden">
+    <div class="top-actions">
+      <button class="dark-btn" data-action="menu">← Menü</button>
+      <button class="dark-btn" data-action="restart">↻ Neustart</button>
+    </div>
+
+    <div class="stats">
+      <div class="stat"><small>Deine Relikte</small><strong id="relicCount">0</strong></div>
+      <div class="stat"><small>Ziel</small><strong id="target">5</strong></div>
+      <div class="stat"><small>Züge</small><strong id="turnCount">0</strong></div>
+    </div>
+
+    <div class="board-wrap"><div id="board" class="board"></div></div>
+    <div class="legend">
+      <span>🧑 Du</span><span>🤖 Bots</span><span>💎 Relikt</span>
+      <span>🧱 Mauer</span><span>🚪 Ausgang</span>
+    </div>
+
+    <div class="controls">
+      <button class="empty" tabindex="-1"> </button>
+      <button data-action="move" data-dir="up" aria-label="Nach oben">▲</button>
+      <button class="empty" tabindex="-1"> </button>
+      <button data-action="move" data-dir="left" aria-label="Nach links">◀</button>
+      <button data-action="move" data-dir="down" aria-label="Nach unten">▼</button>
+      <button data-action="move" data-dir="right" aria-label="Nach rechts">▶</button>
+    </div>
+
+    <div id="status" class="panel status">Bereit für den Raubzug.</div>
+    <div class="panel">
+      <h2>🤖 Rivalen</h2>
+      <div id="bots"></div>
+    </div>
+    <p class="muted">Tipp: Du kannst auch die Pfeiltasten auf einer Tastatur verwenden. Auf dem Handy nutzt du die Richtungstasten.</p>
+  </section>
+
+  <section id="endScreen" class="hidden">
+    <div class="panel result">
+      <div class="big" id="endIcon">👑</div>
+      <h2 id="endTitle">Mission geschafft!</h2>
+      <p id="endText"></p>
+      <button class="gold-btn" data-action="restart">Nochmal spielen</button>
+      <button class="dark-btn" data-action="menu">Hauptmenü</button>
+    </div>
+  </section>
+</main>
+
+<footer>GOLDEN HEIST · Offline-Spiel · Keine Käufe, keine Echtgeld-Gewinne</footer>
+
+<script>
+(function () {
+"use strict";
+
+/* Alle Klicks werden zentral verarbeitet.
+   Die Buttons benötigen dadurch keine globalen Funktionsaufrufe. */
+
+const SIZE = 8;
+const SOLO_TARGET = 5;
+const BOT_TARGET = 3;
+
+const WALLS = [
+  "1,1","1,2","1,5","2,5","3,1","3,3","3,6",
+  "4,3","4,6","5,1","5,4","6,2","6,5"
+];
+
+const BOT_NAMES = ["Professor","Blitz","Lucky"];
+const BOT_ICONS = ["🤖","🥷","👾"];
+
+let state = null;
+let best = 0;
+
+const $ = id => document.getElementById(id);
+
+function rand(n) {
+  return Math.floor(Math.random() * n);
+}
+
+function key(x,y) {
+  return x + "," + y;
+}
+
+function inside(x,y) {
+  return x >= 0 && x < SIZE && y >= 0 && y < SIZE;
+}
+
+function isWall(x,y) {
+  return WALLS.includes(key(x,y));
+}
+
+function message(text) {
+  $("status").textContent = text;
+}
+
+function startGame(mode) {
+  const target = mode === "solo" ? SOLO_TARGET : BOT_TARGET;
+
+  state = {
+    mode,
+    target,
+    turn: 0,
+    ended: false,
+    player: {x:0,y:0,relics:0},
+    bots: [],
+    treasures: [],
+    exit: {x:7,y:7}
+  };
+
+  if (mode === "bots") {
+    state.bots = BOT_NAMES.map((name,i) => ({
+      name,
+      icon:BOT_ICONS[i],
+      x:[7,0,7][i],
+      y:[0,7,3][i],
+      relics:0,
+      alive:true
+    }));
+  }
+
+  const occupied = new Set([
+    key(0,0), key(7,7),
+    ...state.bots.map(b=>key(b.x,b.y))
+  ]);
+
+  while (state.treasures.length < 9) {
+    const x = rand(SIZE);
+    const y = rand(SIZE);
+    const k = key(x,y);
+    if (occupied.has(k) || isWall(x,y)) continue;
+    occupied.add(k);
+    state.treasures.push({x,y});
+  }
+
+  $("menu").classList.add("hidden");
+  $("endScreen").classList.add("hidden");
+  $("game").classList.remove("hidden");
+
+  message("Der Raubzug beginnt! Sammle "+target+" Relikte.");
+  draw();
+}
+
+function restartGame() {
+  if (!state) return;
+  const mode = state.mode;
+  startGame(mode);
+}
+
+function goMenu() {
+  state = null;
+  $("game").classList.add("hidden");
+  $("endScreen").classList.add("hidden");
+  $("menu").classList.remove("hidden");
+}
+
+function occupied(x,y,ignoreBot) {
+  if (state.player.x===x && state.player.y===y) return true;
+  return state.bots.some(b =>
+    b.alive && b!==ignoreBot && b.x===x && b.y===y
+  );
+}
+
+function movePlayer(dir) {
+  if (!state || state.ended) return;
+
+  const delta = {
+    up:[0,-1],
+    down:[0,1],
+    left:[-1,0],
+    right:[1,0]
+  }[dir];
+
+  if (!delta) return;
+
+  const x = state.player.x + delta[0];
+  const y = state.player.y + delta[1];
+
+  if (!inside(x,y)) {
+    message("Hier ist der Rand der Karte.");
+    return;
+  }
+  if (isWall(x,y)) {
+    message("Eine Mauer blockiert den Weg.");
+    return;
+  }
+
+  state.player.x = x;
+  state.player.y = y;
+  state.turn++;
+
+  collectRelic(state.player);
+  if (checkExit(state.player,"Du")) return;
+
+  if (state.mode==="bots") {
+    botsMove();
+    if (state.ended) return;
+  }
+
+  draw();
+}
+
+function collectRelic(character) {
+  const i = state.treasures.findIndex(t =>
+    t.x===character.x && t.y===character.y
+  );
+  if (i >= 0) {
+    state.treasures.splice(i,1);
+    character.relics++;
+    if (character===state.player) {
+      message("💎 Relikt gefunden! Du hast "+character.relics+" von "+state.target+".");
+    }
+  }
+}
+
+function checkExit(character,name) {
+  if (character.x!==state.exit.x || character.y!==state.exit.y) return false;
+
+  if (character.relics>=state.target) {
+    finish(name==="Du",name+" hat den Ausgang mit genügend Relikten erreicht!");
+    return true;
+  }
+
+  if (name==="Du") {
+    message("Der Ausgang ist noch verschlossen. Dir fehlen "+(state.target-character.relics)+" Relikt(e).");
+  }
+  return false;
+}
+
+/* Einfache Wegsuche: Bots wählen erreichbare Nachbarfelder,
+   die sie näher an ihr Ziel bringen. */
+function botStep(bot) {
+  const options = [
+    {x:bot.x,y:bot.y-1},
+    {x:bot.x+1,y:bot.y},
+    {x:bot.x,y:bot.y+1},
+    {x:bot.x-1,y:bot.y}
+  ].filter(p =>
+    inside(p.x,p.y) &&
+    !isWall(p.x,p.y) &&
+    !occupied(p.x,p.y,bot)
+  );
+
+  if (!options.length) return;
+
+  let target;
+  if (bot.relics>=state.target) {
+    target=state.exit;
+  } else if (state.treasures.length) {
+    target=state.treasures.reduce((best,t) => {
+      const d=Math.abs(t.x-bot.x)+Math.abs(t.y-bot.y);
+      const bd=Math.abs(best.x-bot.x)+Math.abs(best.y-bot.y);
+      return d<bd?t:best;
+    },state.treasures[0]);
+  } else {
+    target=state.exit;
+  }
+
+  options.sort((a,b) => {
+    const da=Math.abs(a.x-target.x)+Math.abs(a.y-target.y);
+    const db=Math.abs(b.x-target.x)+Math.abs(b.y-target.y);
+    return da-db;
+  });
+
+  // Lucky hat manchmal einen zufälligen Zug.
+  let chosen=options[0];
+  if (bot.name==="Lucky" && Math.random()<0.25) {
+    chosen=options[rand(options.length)];
+  }
+
+  bot.x=chosen.x;
+  bot.y=chosen.y;
+  collectRelic(bot);
+}
+
+function botsMove() {
+  for (const bot of state.bots) {
+    if (state.ended) return;
+
+    botStep(bot);
+
+    if (bot.x===state.exit.x && bot.y===state.exit.y && bot.relics>=state.target) {
+      finish(false,bot.name+" hat den Tresor verlassen!");
+      return;
+    }
+  }
+}
+
+function draw() {
+  if (!state) return;
+
+  $("relicCount").textContent=state.player.relics;
+  $("target").textContent=state.target;
+  $("turnCount").textContent=state.turn;
+
+  const board=$("board");
+  board.innerHTML="";
+
+  for (let y=0;y<SIZE;y++) {
+    for (let x=0;x<SIZE;x++) {
+      const tile=document.createElement("div");
+      tile.className="tile";
+      let icon="";
+
+      if (isWall(x,y)) {
+        tile.classList.add("wall");
+        icon="🧱";
+      }
+
+      if (state.exit.x===x && state.exit.y===y) {
+        tile.classList.add("exit");
+        icon="🚪";
+      }
+
+      if (state.treasures.some(t=>t.x===x && t.y===y)) {
+        tile.classList.add("treasure");
+        icon="💎";
+      }
+
+      const bot=state.bots.find(b=>b.alive && b.x===x && b.y===y);
+      if (bot) {
+        tile.classList.add("bot");
+        icon=bot.icon;
+      }
+
+      if (state.player.x===x && state.player.y===y) {
+        tile.classList.add("player");
+        icon="🧑";
+      }
+
+      const span=document.createElement("span");
+      span.textContent=icon;
+      tile.appendChild(span);
+      board.appendChild(tile);
+    }
+  }
+
+  const bots=$("bots");
+  if (state.mode==="solo") {
+    bots.innerHTML="<p>Solo-Modus aktiv. Es gibt keine konkurrierenden Bots.</p>";
+  } else {
+    bots.innerHTML=state.bots.map(b=>
+      `<div class="bot-row">
+        <span>${b.icon} <strong>${b.name}</strong><br><small>Relikte gesammelt</small></span>
+        <strong>${b.relics} / ${state.target}</strong>
+      </div>`
+    ).join("");
+  }
+
+  $("best").textContent=best;
+}
+
+function finish(won,text) {
+  if (state.ended) return;
+  state.ended=true;
+
+  if (won) {
+    best=Math.max(best,state.player.relics);
+  }
+  $("best").textContent=best;
+
+  $("game").classList.add("hidden");
+  $("endScreen").classList.remove("hidden");
+
+  $("endIcon").textContent=won?"👑":"🗝️";
+  $("endTitle").textContent=won?"Mission geschafft!":"Raubzug beendet";
+  $("endText").textContent=text+" Du hast "+state.player.relics+" Relikte gesammelt und "+state.turn+" Züge gemacht.";
+}
+
+/* Zentraler Event-Handler: Buttons brauchen keine globalen Funktionen. */
+document.addEventListener("click",function(event) {
+  const button=event.target.closest("button[data-action]");
+  if (!button) return;
+
+  switch(button.dataset.action) {
+    case "start":
+      startGame(button.dataset.mode);
+      break;
+    case "move":
+      movePlayer(button.dataset.dir);
+      break;
+    case "menu":
+      goMenu();
+      break;
+    case "restart":
+      restartGame();
+      break;
+  }
+});
+
+/* Tastatursteuerung für Computer und Tastaturgeräte. */
+document.addEventListener("keydown",function(event) {
+  const dirs={
+    ArrowUp:"up",
+    ArrowDown:"down",
+    ArrowLeft:"left",
+    ArrowRight:"right"
+  };
+  if (dirs[event.key] && state && !state.ended &&
+      !$("game").classList.contains("hidden")) {
+    event.preventDefault();
+    movePlayer(dirs[event.key]);
+  }
+});
+
+})();
+</script>
+</body>
+</html>
